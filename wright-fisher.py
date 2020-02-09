@@ -9,64 +9,67 @@ import matplotlib as mpl
 import seaborn as sns 
 from numpy.random import binomial
 
-# def simulation(p, N, s, repetitions = 1000):
-#     N = int(2 * N) # why wouldn't this be an integer by default? 
-#     n1 = np.ones(repetitions) * (N * p)
-#     T = np.empty_like(n1)
-#     update = (n1 > 0) & (n1 < N)
-#     t = 0
-#     while update.any():
-#         t += 1
-#         p = n1 * (1 + s) / (N + n1 * s)
-#         print(p)
-#         n1[update] = np.random.binomial(N, p[update])
-#         T[update] = t
-#         update = (n1 > 0) & (n1 < N)
-#     return n1 == N, T
-# #print(simulation(N=1000, s = 0.1)) 
-# fixations, times = simulation(p=0.5, N=100, s=0, repetitions=1000)
-# fixation_prob = fixations.mean()
-# fixation_time = times[fixations].mean()
-# w, h = plt.rcParams['figure.figsize'] # customize window size 
-# #fig, ax = plt.subplots(1, 2, figsize = (2 * w, h))
-# fig, ax = plt.subplots()
-# sns.distplot(times[fixations], ax = ax)
-# ax.axvline(times[fixations].mean(), color = 'k', ls = '--')
-# ax.set(xlabel='Fixation time', ylabel = 'Frequency')
-# ax.set_title("Time to Fixation")
-# fig.savefig("Histogram_part1")
 
-# p=0.5
-# repetitions = 1000
-# s = 0
-# Nrange = np.logspace(2, 3, dtype=np.uint64)
+# code adapted from https://github.com/yoavram/PyConIL2016/blob/master/notebook.ipynb
 
-# def fix_time_simulation(N):
-#     fixations, times = simulation(p=p, N=N, s=s, repetitions=repetitions)
-#     fixation_time_mean = times[fixations].mean()
-#     fixation_time_std =  times[fixations].std(ddof=1) / np.sqrt(repetitions)
-#     return fixation_time_mean, fixation_time_std
+def simulation(p, N, s, repetitions = 1000):
+    N = int(2 * N) # why wouldn't this be an integer by default? 
+    n1 = np.ones(repetitions) * (N * p)
+    T = np.empty_like(n1)
+    update = (n1 > 0) & (n1 < N)
+    t = 0
+    while update.any():
+        t += 1
+        p = n1 * (1 + s) / (N + n1 * s)
+        print(p)
+        n1[update] = np.random.binomial(N, p[update])
+        T[update] = t
+        update = (n1 > 0) & (n1 < N)
+    return n1 == N, T
+#print(simulation(N=1000, s = 0.1)) 
+fixations, times = simulation(p=0.5, N=100, s=0, repetitions=1000)
+fixation_prob = fixations.mean()
+fixation_time = times[fixations].mean()
+w, h = plt.rcParams['figure.figsize'] # customize window size 
+#fig, ax = plt.subplots(1, 2, figsize = (2 * w, h))
+fig, ax = plt.subplots()
+sns.distplot(times[fixations], ax = ax)
+ax.axvline(times[fixations].mean(), color = 'k', ls = '--')
+ax.set(xlabel='Fixation time', ylabel = 'Frequency')
+ax.set_title("Time to Fixation")
+fig.savefig("Histogram_part1")
 
-# fix_time_sim = np.array([
-#     fix_time_simulation(N=N)
-#     for N in Nrange
-# ])
+p=0.5
+repetitions = 1000
+s = 0
+Nrange = np.logspace(2, 3, dtype=np.uint64)
 
-# def fixation_time_plot(N, mean, sem):
-#     fig, ax = plt.subplots(1, 1)
-#     ax.errorbar(x=N, y=mean, yerr=sem, 
-#                 fmt='o', capsize=5, label='Simulation')
-#     ax.set(
-#         xlabel='Population size (N)',
-#         ylabel='Fixation time',
-#         xscale='log', 
-#         xlim=(0.5 * Nrange.min(), 1.5 * Nrange.max()),
-#     )
-#     return fig, ax
+def fix_time_simulation(N):
+    fixations, times = simulation(p=p, N=N, s=s, repetitions=repetitions)
+    fixation_time_mean = times[fixations].mean()
+    fixation_time_std =  times[fixations].std(ddof=1) / np.sqrt(repetitions)
+    return fixation_time_mean, fixation_time_std
 
-# fixation_time_plot(Nrange, fix_time_sim[:,0], fix_time_sim[:,1]);
-# plt.show()
-# fig.savefig("Histogram_part2.png")
+fix_time_sim = np.array([
+    fix_time_simulation(N=N)
+    for N in Nrange
+])
+
+def fixation_time_plot(N, mean, sem):
+    fig, ax = plt.subplots(1, 1)
+    ax.errorbar(x=N, y=mean, yerr=sem, 
+                fmt='o', capsize=5, label='Simulation')
+    ax.set(
+        xlabel='Population size (N)',
+        ylabel='Fixation time',
+        xscale='log', 
+        xlim=(0.5 * Nrange.min(), 1.5 * Nrange.max()),
+    )
+    return fig, ax
+
+fixation_time_plot(Nrange, fix_time_sim[:,0], fix_time_sim[:,1]);
+plt.show()
+fig.savefig("Histogram_part2.png")
 
 
 def simulation_3(p, N, s, repetitions = 1000):
